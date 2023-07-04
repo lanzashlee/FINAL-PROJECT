@@ -1,0 +1,62 @@
+import java.awt.EventQueue;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class Login extends JFrame {
+
+	private JPanel contentPane;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Login frame = new Login();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public Login() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 1000, 563);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JButton enterbtn = new JButton("");
+		enterbtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Info AppointmentList = new Info();
+				AppointmentList.setVisible(true);
+				dispose();
+			}
+		});
+		enterbtn.setBounds(62, 417, 186, 48);
+		enterbtn.setBorderPainted(false);
+		enterbtn.setContentAreaFilled(false);
+		enterbtn.setOpaque(false);
+		contentPane.add(enterbtn);
+		
+		JLabel lblNewLabel = new JLabel("New label");
+		lblNewLabel.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\Green Blue Medical Healthcare Facebook Cover.jpg"));
+		lblNewLabel.setBounds(0, 0, 1000, 563);
+		contentPane.add(lblNewLabel);
+	}
+}
