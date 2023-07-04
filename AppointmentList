@@ -1,0 +1,100 @@
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class AppointmentList extends JFrame {
+    private JTable table;
+    private DefaultTableModel model;
+
+    public AppointmentList(DefaultTableModel tableModel) {
+        model = tableModel;
+
+        setTitle("Appointment Details");
+        setBounds(100, 100, 1000, 563);
+        
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        getContentPane().setLayout(null);
+        
+        table = new JTable(model) {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                return getValueAt(0, column).getClass();
+            }
+        };
+        
+        table.setDefaultRenderer(Object.class, new HighlightRenderer());
+        
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setViewportBorder(null);
+        scrollPane.setBounds(196, 129, 763, 310);
+        getContentPane().add(scrollPane);
+        
+        JButton btnDelete = new JButton("Delete");
+        btnDelete.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    model.removeRow(selectedRow);
+                }
+            }
+        });
+        btnDelete.setBounds(870, 459, 89, 23);
+        getContentPane().add(btnDelete);
+        
+        JLabel lblNewLabel = new JLabel("New label");
+        lblNewLabel.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\3.png"));
+        lblNewLabel.setBounds(0, 0, 1000, 563);
+        getContentPane().add(lblNewLabel);
+        
+        JButton btnback = new JButton("");
+        btnback.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Login login = new Login();
+                login.setVisible(true);
+                dispose();
+            }
+        });
+        btnback.setBounds(927, 22, 49, 32);
+        btnback.setBorderPainted(false);
+        btnback.setContentAreaFilled(false);
+        btnback.setOpaque(false);
+        getContentPane().add(btnback);
+        
+        JButton btnNewButton = new JButton("");
+        btnNewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Info AppointmentList = new Info();
+                AppointmentList.setVisible(true);
+                dispose();
+            }
+        });
+        btnNewButton.setBounds(10, 129, 195, 86);
+        btnNewButton.setBorderPainted(false);
+        btnNewButton.setContentAreaFilled(false);
+        btnNewButton.setOpaque(false);
+        getContentPane().add(btnNewButton);
+    }
+    
+    private class HighlightRenderer extends DefaultTableCellRenderer {
+        @Override
+        public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            java.awt.Component cellComponent = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            
+            if (model.getRowCount() > 0 && row == model.getRowCount() - 1) {
+                cellComponent.setBackground(Color.GREEN);
+            } else {
+                cellComponent.setBackground(table.getBackground());
+            }
+            
+            return cellComponent;
+        }
+    }
+}
