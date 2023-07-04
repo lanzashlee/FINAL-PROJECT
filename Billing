@@ -1,0 +1,93 @@
+import java.awt.EventQueue;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.Font;
+
+public class Billing extends JFrame {
+
+    private JPanel contentPane;
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    Billing frame = new Billing(null, null, null);
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public Billing(String treatment, String date, String time) {
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Dispose the frame instead of exiting the application
+        setBounds(100, 100, 1000, 563);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(contentPane);
+
+        double billAmount = 0.0;
+        if (treatment.equals("Teeth Cleaning")) {
+            billAmount = 1500;
+        } else if (treatment.equals("Teeth Whitening")) {
+            billAmount = 5000;
+        } else if (treatment.equals("Extraction")) {
+            billAmount = 2000;
+        } else if (treatment.equals("Veneers")) {
+            billAmount = 8000;
+        } else if (treatment.equals("Crowns")) {
+            billAmount = 10000;
+        } else if (treatment.equals("Root Canal")) {
+            billAmount = 5000;
+        } else if (treatment.equals("Braces")) {
+            billAmount = 50000;
+        } else if (treatment.equals("Bonding")) {
+            billAmount = 2500;
+        } else if (treatment.equals("Dentures")) {
+            billAmount = 10000;
+        }
+        contentPane.setLayout(null);
+
+        JLabel lblNewLabel = new JLabel("Treatment: " + treatment);
+        lblNewLabel.setFont(new Font("Verdana", Font.BOLD, 16));
+        lblNewLabel.setBounds(221, 297, 421, 71);
+        contentPane.add(lblNewLabel);
+
+        JLabel lblNewLabel_1 = new JLabel("Bill Amount: PHP - " + billAmount);
+        lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 16));
+        lblNewLabel_1.setBounds(221, 379, 421, 71);
+        contentPane.add(lblNewLabel_1);
+
+        JLabel lblDate = new JLabel("Date: " + date);
+        lblDate.setFont(new Font("Verdana", Font.BOLD, 16));
+        lblDate.setBounds(221, 150, 461, 71);
+        contentPane.add(lblDate);
+
+        JLabel lblNewLabel_2 = new JLabel("New label");
+        lblNewLabel_2.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\4.png"));
+        lblNewLabel_2.setBounds(0, 0, 1000, 563);
+        contentPane.add(lblNewLabel_2);
+
+        JButton btnNewButton = new JButton("");
+        btnNewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Login Login = new Login();
+                Login.setVisible(true);
+                dispose();
+            }
+        });
+        btnNewButton.setBounds(926, 18, 60, 30);
+        btnNewButton.setBorderPainted(false);
+        btnNewButton.setContentAreaFilled(false);
+        btnNewButton.setOpaque(false);
+        contentPane.add(btnNewButton);
+    }
+}
