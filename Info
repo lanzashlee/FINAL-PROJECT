@@ -1,0 +1,316 @@
+import java.awt.EventQueue;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.ImageIcon;
+import java.awt.event.ActionListener;
+import java.util.Vector;
+import java.awt.event.ActionEvent;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JTextField;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.awt.Font;
+import java.awt.Color;
+import com.toedter.calendar.JDateChooser;
+
+public class Info extends JFrame {
+
+    private JPanel contentPane;
+    private JTextField Name;
+    private JTextField PhoneNo;
+    private JTextField Address;
+    private JTextField EmailAddress;
+    private JTextField Birthdate;
+    private JComboBox<String> Treatment;
+    private JComboBox<String> timeComboBox;
+    private DefaultTableModel model;
+    private JDateChooser dateChooser;
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    Info frame = new Info();
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public Info() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 1000, 563);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+        setContentPane(contentPane);
+        contentPane.setLayout(null);
+
+        JButton listbtn = new JButton("");
+        listbtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Info inf = new Info ();
+                inf.setVisible(true);
+                dispose();
+            }
+        });
+        listbtn.setBounds(52, 97, 124, 101);
+        listbtn.setBorderPainted(false);
+        listbtn.setContentAreaFilled(false);
+        listbtn.setOpaque(false);
+        contentPane.add(listbtn);
+        
+        JButton btnNewButton = new JButton("SAVE INFO");
+        btnNewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String name = Name.getText();
+                String phoneNo = PhoneNo.getText();
+                String address = Address.getText();
+                String emailAddress = EmailAddress.getText();
+                String birthdate = Birthdate.getText();
+                String treatment = Treatment.getSelectedItem().toString();
+                String time = timeComboBox.getSelectedItem().toString();
+                String chosenDate = dateChooser.getDate().toString();
+
+                // Add the row to the table model
+                model.addRow(new Object[]{name, phoneNo, address, emailAddress, birthdate, treatment, chosenDate, time});
+
+                // Save the information to a file
+                saveDataToFile();
+                
+                // Display the billing information
+                Billing billingFrame = new Billing(treatment, chosenDate, time);
+                billingFrame.setVisible(true);
+                
+                Name.setText("");
+                PhoneNo.setText("");
+                Address.setText("");
+                EmailAddress.setText("");
+                Birthdate.setText("");
+            }
+        });
+
+        btnNewButton.setBounds(817, 468, 117, 23);
+        contentPane.add(btnNewButton);
+        listbtn.setBounds(52, 97, 124, 101);
+        listbtn.setBorderPainted(false);
+        listbtn.setContentAreaFilled(false);
+        listbtn.setOpaque(false);
+        contentPane.add(listbtn);
+
+        // Create the table model
+        model = new DefaultTableModel();
+        model.addColumn("Name");
+        model.addColumn("PhoneNo");
+        model.addColumn("Address");
+        model.addColumn("EmailAddress");
+        model.addColumn("Birthdate");
+        model.addColumn("Treatment");
+        model.addColumn("Date");
+        model.addColumn("Time");
+
+        // Load the data from file
+        loadDataFromFile();
+
+        JLabel lblNewLabel_1 = new JLabel("Name:");
+        lblNewLabel_1.setBounds(287, 187, 88, 23);
+        contentPane.add(lblNewLabel_1);
+
+        JLabel lblNewLabel_1_1 = new JLabel("PhoneNo:");
+        lblNewLabel_1_1.setBounds(287, 241, 88, 23);
+        contentPane.add(lblNewLabel_1_1);
+
+        JLabel lblNewLabel_1_2 = new JLabel("Address");
+        lblNewLabel_1_2.setBounds(287, 329, 88, 23);
+        contentPane.add(lblNewLabel_1_2);
+
+        JLabel lblNewLabel_1_3 = new JLabel("EmailAddress:");
+        lblNewLabel_1_3.setBounds(287, 379, 88, 23);
+        contentPane.add(lblNewLabel_1_3);
+
+        JLabel lblNewLabel_1_2_1 = new JLabel("Birthdate:");
+        lblNewLabel_1_2_1.setBounds(287, 285, 67, 23);
+        contentPane.add(lblNewLabel_1_2_1);
+
+        JLabel lblNewLabel_1_4 = new JLabel("Treatment:");
+        lblNewLabel_1_4.setBounds(685, 187, 88, 23);
+        contentPane.add(lblNewLabel_1_4);
+
+        JLabel lblNewLabel_1_1_1 = new JLabel("Date:");
+        lblNewLabel_1_1_1.setBounds(685, 241, 88, 23);
+        contentPane.add(lblNewLabel_1_1_1);
+
+        JLabel lblNewLabel_1_1_2 = new JLabel("Time:");
+        lblNewLabel_1_1_2.setBounds(685, 304, 88, 23);
+        contentPane.add(lblNewLabel_1_1_2);
+
+        Name = new JTextField();
+        Name.setBackground(new Color(192, 192, 192));
+        Name.setFont(new Font("Tahoma", Font.BOLD, 12));
+        Name.setBounds(375, 187, 161, 30);
+        contentPane.add(Name);
+        Name.setColumns(10);
+
+        PhoneNo = new JTextField();
+        PhoneNo.setBackground(new Color(192, 192, 192));
+        PhoneNo.setFont(new Font("Tahoma", Font.BOLD, 12));
+        PhoneNo.setColumns(10);
+        PhoneNo.setBounds(375, 241, 161, 30);
+        contentPane.add(PhoneNo);
+
+        Address = new JTextField();
+        Address.setBackground(new Color(192, 192, 192));
+        Address.setFont(new Font("Tahoma", Font.BOLD, 12));
+        Address.setColumns(10);
+        Address.setBounds(375, 329, 161, 30);
+        contentPane.add(Address);
+
+        EmailAddress = new JTextField();
+        EmailAddress.setBackground(new Color(192, 192, 192));
+        EmailAddress.setFont(new Font("Tahoma", Font.BOLD, 12));
+        EmailAddress.setColumns(10);
+        EmailAddress.setBounds(375, 379, 161, 30);
+        contentPane.add(EmailAddress);
+
+        Birthdate = new JTextField();
+        Birthdate.setBackground(new Color(192, 192, 192));
+        Birthdate.setFont(new Font("Tahoma", Font.BOLD, 12));
+        Birthdate.setColumns(10);
+        Birthdate.setBounds(375, 287, 161, 30);
+        contentPane.add(Birthdate);
+
+        Treatment = new JComboBox<String>();
+        Treatment.setBounds(773, 187, 161, 30);
+        Treatment.addItem("Teeth Cleaning");
+        Treatment.addItem("Teeth Whitening ");
+        Treatment.addItem("Extraction ");
+        Treatment.addItem("Veneers");
+        Treatment.addItem("Crowns");
+        Treatment.addItem("Root Canal");
+        Treatment.addItem("Braces");
+        Treatment.addItem("Bonding");
+        Treatment.addItem("Dentures");
+        contentPane.add(Treatment);
+
+        timeComboBox = new JComboBox<String>();
+        timeComboBox.setBounds(773, 305, 161, 30);
+        timeComboBox.addItem("9:00 AM");
+        timeComboBox.addItem("10:00 AM");
+        timeComboBox.addItem("11:00 AM");
+        timeComboBox.addItem("12:00 AM");
+        timeComboBox.addItem("1:00 PM");
+        timeComboBox.addItem("1:30 PM");
+        timeComboBox.addItem("2:00 PM");
+        // Add more time options as needed
+        contentPane.add(timeComboBox);
+
+        JButton appointments = new JButton("");
+        appointments.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                AppointmentList appointmentlist = new AppointmentList(model);
+                appointmentlist.setVisible(true);
+                dispose();
+            }
+        });
+        appointments.setBounds(52, 304, 117, 101);
+        appointments.setBorderPainted(false);
+        appointments.setContentAreaFilled(false);
+        appointments.setOpaque(false);
+        contentPane.add(appointments);
+
+        JDateChooser dateChooser = new JDateChooser();
+        dateChooser.setBounds(773, 244, 161, 30);
+        contentPane.add(dateChooser);
+
+        btnNewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String name = Name.getText();
+                String phoneNo = PhoneNo.getText();
+                String address = Address.getText();
+                String emailAddress = EmailAddress.getText();
+                String birthdate = Birthdate.getText();
+                String treatment = Treatment.getSelectedItem().toString();
+                String time = timeComboBox.getSelectedItem().toString();
+                String date = ((JTextField) dateChooser.getDateEditor().getUiComponent()).getText(); // Get the selected date from the dateChooser
+
+                // Add the row to the table model
+                model.addRow(new Object[]{name, phoneNo, address, emailAddress, birthdate, treatment, date, time});
+
+                // Save the information to a file
+                saveDataToFile();
+
+                // Display the billing information
+                Billing billingFrame = new Billing(treatment, date, time);
+                billingFrame.setVisible(true);
+
+                Name.setText("");
+                PhoneNo.setText("");
+                Address.setText("");
+                EmailAddress.setText("");
+                Birthdate.setText("");
+            }
+        });
+
+
+        btnNewButton.setBounds(817, 468, 117, 23);
+        contentPane.add(btnNewButton);
+
+        JLabel lblNewLabel = new JLabel("");
+        lblNewLabel.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\2.png"));
+        lblNewLabel.setBounds(0, 0, 1000, 526);
+        contentPane.add(lblNewLabel);
+
+    }
+
+    private void saveDataToFile() {
+        try {
+            FileWriter writer = new FileWriter("appointment_data.txt");
+            int rowCount = model.getRowCount();
+            int columnCount = model.getColumnCount();
+
+            // Write the table data to the file
+            for (int i = 0; i < rowCount; i++) {
+                for (int j = 0; j < columnCount; j++) {
+                    writer.write(model.getValueAt(i, j) + ",");
+                }
+                writer.write("\n");
+            }
+
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadDataFromFile() {
+        try {
+            FileReader reader = new FileReader("appointment_data.txt");
+            BufferedReader br = new BufferedReader(reader);
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                Vector<Object> rowData = new Vector<Object>();
+                String[] values = line.split(",");
+                for (String value : values) {
+                    rowData.add(value);
+                }
+                model.addRow(rowData);
+            }
+
+            br.close();
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
