@@ -23,7 +23,6 @@ import java.awt.Font;
 import java.awt.Color;
 import com.toedter.calendar.JDateChooser;
 
-
 public class Info extends JFrame {
 
     private JPanel contentPane;
@@ -75,7 +74,7 @@ public class Info extends JFrame {
         listbtn.setContentAreaFilled(false);
         listbtn.setOpaque(false);
         contentPane.add(listbtn);
-        
+
         JButton btnNewButton = new JButton("SAVE INFO");
         btnNewButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -87,19 +86,20 @@ public class Info extends JFrame {
                 String treatment = Treatment.getSelectedItem().toString();
                 String time = timeComboBox.getSelectedItem().toString();
                 String date = ((JTextField) dateChooser.getDateEditor().getUiComponent()).getText(); 
-                
+
                 // Validate the input fields
                 if (name.isEmpty() || phoneNo.isEmpty() || address.isEmpty() || emailAddress.isEmpty()) {
                     JOptionPane.showMessageDialog(Info.this, "Please fill in all the required fields.", "Error", JOptionPane.ERROR_MESSAGE);
                     return; // Stop further execution
                 }
-                
+
                 java.util.Date selectedDate = dateChooser.getDate();
                 java.util.Date currentDate = new java.util.Date();
                 if (selectedDate.before(currentDate)) {
                     JOptionPane.showMessageDialog(Info.this, "Please select a valid date.", "Error", JOptionPane.ERROR_MESSAGE);
                     return; // Stop further execution
                 }
+                
                 // Add the row to the table model
                 model.addRow(new Object[]{name, phoneNo, address, emailAddress, birthdate, treatment, date, time});
 
@@ -115,6 +115,7 @@ public class Info extends JFrame {
                 PhoneNo.setText("");
                 Address.setText("");
                 EmailAddress.setText("");
+                Birthdate.setText("");
             }
         });
 
@@ -258,13 +259,13 @@ public class Info extends JFrame {
                 String treatment = Treatment.getSelectedItem().toString();
                 String time = timeComboBox.getSelectedItem().toString();
                 String date = ((JTextField) dateChooser.getDateEditor().getUiComponent()).getText(); 
-                
+
                 // Validate the input fields
                 if (name.isEmpty() || phoneNo.isEmpty() || address.isEmpty() || emailAddress.isEmpty()) {
                     JOptionPane.showMessageDialog(Info.this, "Please fill in all the required fields.", "Error", JOptionPane.ERROR_MESSAGE);
                     return; // Stop further execution
                 }
-                
+
                 java.util.Date selectedDate = dateChooser.getDate();
                 java.util.Date currentDate = new java.util.Date();
                 if (selectedDate.before(currentDate)) {
@@ -286,24 +287,39 @@ public class Info extends JFrame {
                 PhoneNo.setText("");
                 Address.setText("");
                 EmailAddress.setText("");
+                Birthdate.setText("");
             }
         });
 
         btnNewButton.setBounds(817, 468, 117, 23);
         contentPane.add(btnNewButton);
-             
-             Birthdate = new JTextField();
-             Birthdate.setFont(new Font("Tahoma", Font.BOLD, 12));
-             Birthdate.setColumns(10);
-             Birthdate.setBackground(Color.LIGHT_GRAY);
-             Birthdate.setBounds(375, 288, 161, 30);
-             contentPane.add(Birthdate);
-             
-             JLabel lblNewLabel = new JLabel("");
-             lblNewLabel.setBackground(new Color(192, 192, 192));
-             lblNewLabel.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\2.png"));
-             lblNewLabel.setBounds(0, 0, 1000, 526);
-             contentPane.add(lblNewLabel);
+
+        Birthdate = new JTextField();
+        Birthdate.setFont(new Font("Tahoma", Font.BOLD, 12));
+        Birthdate.setColumns(10);
+        Birthdate.setBackground(Color.LIGHT_GRAY);
+        Birthdate.setBounds(375, 288, 161, 30);
+        contentPane.add(Birthdate);
+        
+        JButton btnNewButton_1 = new JButton("");
+        btnNewButton_1.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		Login log = new Login();
+                log.setVisible(true);
+                dispose();
+        	}
+        });
+        btnNewButton_1.setBounds(930, 11, 46, 23);
+        btnNewButton_1.setBorderPainted(false);
+        btnNewButton_1.setContentAreaFilled(false);
+        btnNewButton_1.setOpaque(false);
+        contentPane.add(btnNewButton_1);
+        
+                JLabel lblNewLabel = new JLabel("");
+                lblNewLabel.setBackground(new Color(192, 192, 192));
+                lblNewLabel.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\2.png"));
+                lblNewLabel.setBounds(0, 0, 1000, 526);
+                contentPane.add(lblNewLabel);
     }
 
     private void saveDataToFile() {
@@ -325,7 +341,6 @@ public class Info extends JFrame {
             e.printStackTrace();
         }
     }
-
     private void loadDataFromFile() {
         try {
             FileReader reader = new FileReader("appointment_data.txt");
