@@ -4,6 +4,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.Color;
@@ -51,14 +52,15 @@ public class AppointmentList extends JFrame {
                 }
             }
         });
-        btnDelete.setBounds(870, 459, 89, 23);
+        btnDelete.setBounds(848, 459, 111, 23);
         getContentPane().add(btnDelete);
 
-        JButton btnEdit = new JButton("Edit");
+        JButton btnEdit = new JButton("Reschedule");
         btnEdit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow != -1) {
+                	
                     // Get the selected appointment details
                     String name = model.getValueAt(selectedRow, 0).toString();
                     String phoneNo = model.getValueAt(selectedRow, 1).toString();
@@ -68,21 +70,20 @@ public class AppointmentList extends JFrame {
                     String treatment = model.getValueAt(selectedRow, 5).toString();
                     String date = model.getValueAt(selectedRow, 6).toString();
                     String time = model.getValueAt(selectedRow, 7).toString();
-
+                    
+                    model.removeRow(selectedRow);
+                    saveDataToFile();
+                    
                     // Create a new Info frame with the selected appointment details
                     Info editAppointment = new Info();
                     editAppointment.setVisible(true);
                     dispose();
+                    
                 }
             }
         });
-        btnEdit.setBounds(771, 459, 89, 23);
+        btnEdit.setBounds(699, 459, 123, 23);
         getContentPane().add(btnEdit);
-
-        JLabel lblNewLabel = new JLabel("New label");
-        lblNewLabel.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\3.png"));
-        lblNewLabel.setBounds(0, 0, 1000, 563);
-        getContentPane().add(lblNewLabel);
 
         JButton btnback = new JButton("");
         btnback.addActionListener(new ActionListener() {
@@ -111,6 +112,11 @@ public class AppointmentList extends JFrame {
         btnNewButton.setContentAreaFilled(false);
         btnNewButton.setOpaque(false);
         getContentPane().add(btnNewButton);
+        
+                JLabel lblNewLabel = new JLabel("New label");
+                lblNewLabel.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\3.png"));
+                lblNewLabel.setBounds(0, 0, 1000, 563);
+                getContentPane().add(lblNewLabel);
     }
 
     private class HighlightRenderer extends DefaultTableCellRenderer {
