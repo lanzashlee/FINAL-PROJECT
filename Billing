@@ -68,7 +68,6 @@ public class Billing extends JFrame {
         this.time = time;
 
         double billAmount = 0.0;
-        
         if (treatment.equals("Teeth Cleaning")) {
             billAmount = 1500;
         } else if (treatment.equals("Teeth Whitening")) {
@@ -94,28 +93,28 @@ public class Billing extends JFrame {
         JLabel lblNewLabel = new JLabel("Treatment: " + treatment);
         lblNewLabel.setBackground(new Color(192, 192, 192));
         lblNewLabel.setFont(new Font("Verdana", Font.BOLD, 16));
-        lblNewLabel.setBounds(622, 146, 299, 71);
+        lblNewLabel.setBounds(640, 171, 240, 52);
         contentPane.add(lblNewLabel);
 
         // Label for displaying bill amount
         JLabel lblNewLabel_1 = new JLabel("Bill Amount: PHP - " + billAmount);
         lblNewLabel_1.setBackground(new Color(192, 192, 192));
         lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 16));
-        lblNewLabel_1.setBounds(622, 215, 308, 71);
+        lblNewLabel_1.setBounds(640, 263, 308, 71);
         contentPane.add(lblNewLabel_1);
 
         // Label for displaying date
         JLabel lblDate = new JLabel("Date: " + date);
         lblDate.setBackground(new Color(11, 219, 0));
         lblDate.setFont(new Font("Tahoma", Font.BOLD, 16));
-        lblDate.setBounds(221, 215, 281, 71);
+        lblDate.setBounds(183, 263, 281, 71);
         contentPane.add(lblDate);
         
         // Label for displaying time
         JLabel lbltime = new JLabel("Time: " + time);
         lbltime.setBackground(new Color(192, 192, 192));
         lbltime.setFont(new Font("Verdana", Font.BOLD, 16));
-        lbltime.setBounds(221, 292, 281, 71);
+        lbltime.setBounds(183, 365, 281, 71);
         contentPane.add(lbltime);
 
         // Button for confirming billing
@@ -147,12 +146,12 @@ public class Billing extends JFrame {
         JLabel lblname = new JLabel("Name: " + name);
         lblname.setFont(new Font("Tahoma", Font.BOLD, 16));
         lblname.setBackground(new Color(11, 219, 0));
-        lblname.setBounds(221, 146, 281, 71);
+        lblname.setBounds(183, 162, 281, 71);
         contentPane.add(lblname);
         
         // Label for displaying an image
         JLabel lblNewLabel_2 = new JLabel("New label");
-        lblNewLabel_2.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\4.png"));
+        lblNewLabel_2.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\Green Blue Medical Healthcare Facebook Cover.png"));
         lblNewLabel_2.setBounds(0, 0, 1000, 563);
         contentPane.add(lblNewLabel_2);
     }
@@ -205,7 +204,7 @@ public class Billing extends JFrame {
     // Saves the data to a file
     private void saveDataToFile() {
         try {
-            FileWriter writer = new FileWriter("patient_data.txt", true);
+            FileWriter writer = new FileWriter("appointment_data.txt", true);
             writer.write(name + "," + phoneNo + "," + address + "," + emailAddress + "," +
                     birthdate + "," + treatment + "," + date + "," + time + "\n");
             writer.close();
