@@ -19,9 +19,11 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.ParseException;
 import java.awt.Font;
 import java.awt.Color;
 import com.toedter.calendar.JDateChooser;
+import java.text.SimpleDateFormat;
 
 public class Info extends JFrame {
 
@@ -30,13 +32,13 @@ public class Info extends JFrame {
     private JTextField PhoneNo;
     private JTextField Address;
     private JTextField EmailAddress;
-    private JTextField Birthdate;
     private JComboBox<String> Treatment;
     private JComboBox<String> timeComboBox;
     private DefaultTableModel model;
     private JDateChooser dateChooser;
     private HashSet<String> bookedDates;
     private JTextField textField;
+    private JDateChooser dateChooserBirthdate;
 
 
     public static void main(String[] args) {
@@ -74,7 +76,7 @@ public class Info extends JFrame {
         listbtn.setContentAreaFilled(false);
         listbtn.setOpaque(false);
         contentPane.add(listbtn);
-
+        
         JButton btnNewButton = new JButton("SAVE INFO");
         btnNewButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -82,11 +84,11 @@ public class Info extends JFrame {
                 String phoneNo = PhoneNo.getText();
                 String address = Address.getText();
                 String emailAddress = EmailAddress.getText();
-                String birthdate = Birthdate.getText();
                 String treatment = Treatment.getSelectedItem().toString();
                 String time = timeComboBox.getSelectedItem().toString();
                 String date = ((JTextField) dateChooser.getDateEditor().getUiComponent()).getText(); 
-
+                String birthdate = ((JTextField) dateChooserBirthdate.getDateEditor().getUiComponent()).getText();
+                
                 // Validate the input fields
                 if (name.isEmpty() || phoneNo.isEmpty() || address.isEmpty() || emailAddress.isEmpty()) {
                     JOptionPane.showMessageDialog(Info.this, "Please fill in all the required fields.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -100,28 +102,28 @@ public class Info extends JFrame {
                     return; // Stop further execution
                 }
                 
+                // Check if the selected date and time combination is already booked
+                String selectedDateTime = date + " " + time;
+                if (isDateTimeSlotTaken(selectedDateTime)) {
+                    JOptionPane.showMessageDialog(Info.this, "This date and time slot are not available. Please select another date or time.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return; // Stop further execution
+                }
+                
                 // Add the row to the table model
                 model.addRow(new Object[]{name, phoneNo, address, emailAddress, birthdate, treatment, date, time});
 
-                // Save the information to a file
-                saveDataToFile();
+                bookedDates.add(selectedDateTime);
 
                 // Display the billing information
                 Billing billingFrame = new Billing(name, phoneNo, address, emailAddress, birthdate, treatment, date, time);
                 billingFrame.setVisible(true);
-
-                // Reset the input fields
-                Name.setText("");
-                PhoneNo.setText("");
-                Address.setText("");
-                EmailAddress.setText("");
-                Birthdate.setText("");
+                
             }
         });
-
-
+        
         bookedDates = new HashSet<String>();
-
+       
+        
         btnNewButton.setBounds(817, 468, 117, 23);
         contentPane.add(btnNewButton);
         listbtn.setBounds(52, 97, 124, 101);
@@ -140,9 +142,6 @@ public class Info extends JFrame {
         model.addColumn("Treatment");
         model.addColumn("Date");
         model.addColumn("Time");
-
-        // Load the data from file
-        loadDataFromFile();
 
         JLabel lblNewLabel_1 = new JLabel("Name:");
         lblNewLabel_1.setBounds(287, 187, 88, 23);
@@ -224,10 +223,12 @@ public class Info extends JFrame {
         timeComboBox.addItem("9:00 AM");
         timeComboBox.addItem("10:00 AM");
         timeComboBox.addItem("11:00 AM");
-        timeComboBox.addItem("12:00 AM");
+        timeComboBox.addItem("12:00 PM");
         timeComboBox.addItem("1:00 PM");
-        timeComboBox.addItem("1:30 PM");
         timeComboBox.addItem("2:00 PM");
+        timeComboBox.addItem("3:00 PM");
+        timeComboBox.addItem("4:00 PM");
+        timeComboBox.addItem("5:00 PM");
         contentPane.add(timeComboBox);
 
         JButton appointments = new JButton("");
@@ -245,7 +246,7 @@ public class Info extends JFrame {
         contentPane.add(appointments);
 
         JDateChooser dateChooser = new JDateChooser();
-        dateChooser.setDateFormatString("MMM d y");
+        dateChooser.setDateFormatString("MM/dd/yyyy");
         dateChooser.setBounds(773, 244, 161, 30);
         contentPane.add(dateChooser);
 
@@ -255,26 +256,44 @@ public class Info extends JFrame {
                 String phoneNo = PhoneNo.getText();
                 String address = Address.getText();
                 String emailAddress = EmailAddress.getText();
-                String birthdate = Birthdate.getText();
+                String birthdate = ((JTextField) dateChooserBirthdate.getDateEditor().getUiComponent()).getText();
                 String treatment = Treatment.getSelectedItem().toString();
                 String time = timeComboBox.getSelectedItem().toString();
-                String date = ((JTextField) dateChooser.getDateEditor().getUiComponent()).getText(); 
-
+                String date = ((JTextField) dateChooser.getDateEditor().getUiComponent()).getText();
+               
                 // Validate the input fields
                 if (name.isEmpty() || phoneNo.isEmpty() || address.isEmpty() || emailAddress.isEmpty()) {
                     JOptionPane.showMessageDialog(Info.this, "Please fill in all the required fields.", "Error", JOptionPane.ERROR_MESSAGE);
                     return; // Stop further execution
                 }
-
                 java.util.Date selectedDate = dateChooser.getDate();
                 java.util.Date currentDate = new java.util.Date();
                 if (selectedDate.before(currentDate)) {
                     JOptionPane.showMessageDialog(Info.this, "Please select a valid date.", "Error", JOptionPane.ERROR_MESSAGE);
                     return; // Stop further execution
                 }
+              
+                // Check if the selected date and time combination is already booked
+                String selectedDateTime = date + " " + time;
+                if (isDateTimeSlotTaken(selectedDateTime)) {
+                    JOptionPane.showMessageDialog(Info.this, "This date and time slot are not available. Please select another date or time.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return; // Stop further execution
+                }
+                
+             // Check if the selected time is before the current time when the date is today
+                if (selectedDate.equals(currentDate)) {
+                    String currentTimeStr = new SimpleDateFormat("hh:mm a").format(currentDate);
+                    String selectedTimeStr = time;
+                    if (selectedTimeStr.compareTo(currentTimeStr) <= 0) {
+                        JOptionPane.showMessageDialog(Info.this, "The selected time has already passed. Please select a future time.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return; // Stop further execution
+                    }
+                }
                 // Add the row to the table model
                 model.addRow(new Object[]{name, phoneNo, address, emailAddress, birthdate, treatment, date, time});
-
+                
+                bookedDates.add(selectedDateTime);
+                
                 // Save the information to a file
                 saveDataToFile();
 
@@ -282,24 +301,20 @@ public class Info extends JFrame {
                 Billing billingFrame = new Billing(name, phoneNo, address, emailAddress, birthdate, treatment, date, time);
                 billingFrame.setVisible(true);
 
-                // Reset the input fields
-                Name.setText("");
-                PhoneNo.setText("");
-                Address.setText("");
-                EmailAddress.setText("");
-                Birthdate.setText("");
+                
             }
         });
-
+        
+        bookedDates = new HashSet<String>();
+        loadDataFromFile(); 
+        
         btnNewButton.setBounds(817, 468, 117, 23);
         contentPane.add(btnNewButton);
 
-        Birthdate = new JTextField();
-        Birthdate.setFont(new Font("Tahoma", Font.BOLD, 12));
-        Birthdate.setColumns(10);
-        Birthdate.setBackground(Color.LIGHT_GRAY);
-        Birthdate.setBounds(375, 288, 161, 30);
-        contentPane.add(Birthdate);
+        dateChooserBirthdate = new JDateChooser();
+        dateChooserBirthdate.setDateFormatString("MM/dd/yyyy");
+        dateChooserBirthdate.setBounds(375, 288, 161, 30);
+        contentPane.add(dateChooserBirthdate);
         
         JButton btnNewButton_1 = new JButton("");
         btnNewButton_1.addActionListener(new ActionListener() {
@@ -321,7 +336,27 @@ public class Info extends JFrame {
                 lblNewLabel.setBounds(0, 0, 1000, 526);
                 contentPane.add(lblNewLabel);
     }
-
+   
+    private boolean isDateTimeSlotTaken(String selectedDateTime) {
+        for (int i = 0; i < model.getRowCount(); i++) {
+            String existingDateTime = model.getValueAt(i, 6) + " " + model.getValueAt(i, 7);
+            if (existingDateTime.equals(selectedDateTime)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private java.util.Date parseDateTime(String dateTimeStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM d y hh:mm a");
+            return sdf.parse(dateTimeStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
     private void saveDataToFile() {
         try {
             FileWriter writer = new FileWriter("appointment_data.txt");
