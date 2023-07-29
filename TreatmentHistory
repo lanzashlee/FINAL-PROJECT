@@ -1,0 +1,112 @@
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JComboBox;
+import javax.swing.JButton;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.BevelBorder;
+
+public class TreatmentHistory extends JFrame {
+
+    private JPanel contentPane;
+    private JTable table;
+
+    public TreatmentHistory(DefaultTableModel model, List<String> patientNames) {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 1000, 563);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(contentPane);
+        contentPane.setLayout(null);
+
+        // Create a JComboBox to display patient names
+        JComboBox<String> patientComboBox = new JComboBox<>();
+        patientComboBox.setBounds(30, 40, 150, 25);
+        contentPane.add(patientComboBox);
+
+        // Populate the patientComboBox with patient names
+        for (String patientName : patientNames) {
+            patientComboBox.addItem(patientName);
+        }
+
+        // Create a map to store treatment history data grouped by name
+        Map<String, List<String[]>> treatmentMap = new HashMap<>();
+
+        // Iterate through the rows of the table model and group data by name
+        for (int row = 0; row < model.getRowCount(); row++) {
+            String patientName = model.getValueAt(row, 0).toString();
+            String patientTreatment = model.getValueAt(row, 5).toString();
+            String patientDate = model.getValueAt(row, 6).toString();
+            String patientTime = model.getValueAt(row, 7).toString();
+
+            String[] rowData = {patientName, patientTreatment, patientDate, patientTime};
+
+            if (treatmentMap.containsKey(patientName)) {
+                treatmentMap.get(patientName).add(rowData);
+            } else {
+                List<String[]> dataList = new ArrayList<>();
+                dataList.add(rowData);
+                treatmentMap.put(patientName, dataList);
+            }
+        }
+
+        // Create a table model to display treatment history
+        DefaultTableModel treatmentModel = new DefaultTableModel();
+        treatmentModel.addColumn("Name");
+        treatmentModel.addColumn("Treatment");
+        treatmentModel.addColumn("Date");
+        treatmentModel.addColumn("Time");
+
+        // Create a table to display treatment history
+        table = new JTable(treatmentModel);
+
+        // Add the table to a scroll pane
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setViewportBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
+        scrollPane.setBounds(88, 150, 836, 328);
+        contentPane.add(scrollPane);
+
+        patientComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String selectedPatient = patientComboBox.getSelectedItem().toString();
+                treatmentModel.setRowCount(0); // Clear the table before updating
+                List<String[]> dataList = treatmentMap.get(selectedPatient);
+                if (dataList != null) {
+                    for (String[] rowData : dataList) {
+                        treatmentModel.addRow(rowData);
+                    }
+                }
+            }
+        });
+        JButton btnNewButton = new JButton("New button");
+        btnNewButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		AppointmentList app = new AppointmentList(model);
+        		app.setVisible(true);
+        		dispose();
+        	}
+        });
+        btnNewButton.setBounds(939, 27, 37, 31);
+        btnNewButton.setBorderPainted(false);
+        btnNewButton.setContentAreaFilled(false);
+        btnNewButton.setOpaque(false);
+        contentPane.add(btnNewButton);
+        
+        JLabel lblNewLabel = new JLabel("New label");
+        lblNewLabel.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\Green Blue Medical Healthcare Facebook Cover 2.png"));
+        lblNewLabel.setBounds(0, 0, 1000, 563);
+        contentPane.add(lblNewLabel);
+    }
+}
