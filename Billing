@@ -137,7 +137,8 @@ public class Billing extends JFrame {
         btnCancel.setBackground(new Color(255, 0, 0));
         btnCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dispose();
+            	dispose(); // Close the Billing frame
+                
             }
         });
         btnCancel.setBounds(859, 470, 100, 30);
@@ -151,7 +152,7 @@ public class Billing extends JFrame {
         
         // Label for displaying an image
         JLabel lblNewLabel_2 = new JLabel("New label");
-        lblNewLabel_2.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\Green Blue Medical Healthcare Facebook Cover.png"));
+        lblNewLabel_2.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\Green Blue Medical Healthcare Facebook Cover 1.png"));
         lblNewLabel_2.setBounds(0, 0, 1000, 563);
         contentPane.add(lblNewLabel_2);
     }
