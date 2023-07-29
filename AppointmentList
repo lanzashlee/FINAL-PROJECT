@@ -8,12 +8,28 @@ import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.JComboBox;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerDateModel;
+import java.util.Date;
+import java.util.List;
+import java.util.Calendar;
+import com.toedter.calendar.JCalendar;
+import com.toedter.calendar.JDateChooser;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.BevelBorder;
+
 
 public class AppointmentList extends JFrame {
     private JTable table;
@@ -21,7 +37,7 @@ public class AppointmentList extends JFrame {
 
     public AppointmentList(DefaultTableModel tableModel) {
         model = tableModel;
-
+        
         setTitle("Appointment Details");
         setBounds(100, 100, 1000, 563);
 
@@ -38,7 +54,7 @@ public class AppointmentList extends JFrame {
         table.setDefaultRenderer(Object.class, new HighlightRenderer());
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setViewportBorder(null);
+        scrollPane.setViewportBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
         scrollPane.setBounds(196, 129, 763, 310);
         getContentPane().add(scrollPane);
 
@@ -60,7 +76,6 @@ public class AppointmentList extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow != -1) {
-                	
                     // Get the selected appointment details
                     String name = model.getValueAt(selectedRow, 0).toString();
                     String phoneNo = model.getValueAt(selectedRow, 1).toString();
@@ -70,15 +85,62 @@ public class AppointmentList extends JFrame {
                     String treatment = model.getValueAt(selectedRow, 5).toString();
                     String date = model.getValueAt(selectedRow, 6).toString();
                     String time = model.getValueAt(selectedRow, 7).toString();
-                    
-                    model.removeRow(selectedRow);
-                    saveDataToFile();
-                    
-                    // Create a new Info frame with the selected appointment details
-                    Info editAppointment = new Info();
-                    editAppointment.setVisible(true);
-                    dispose();
-                    
+
+                    JDateChooser dateChooser = new JDateChooser();
+                    dateChooser.setDateFormatString("MM/dd/yyyy");
+                    dateChooser.setDate(new Date()); 
+
+                    String[] times = {"10:00 AM", "11:00 AM", "12:00 PM","1:00 PM","2:00 PM","3:00 PM"};
+                    JComboBox<String> timePicker = new JComboBox<>(times);
+
+                    Object[] message = {
+                            "Select a new date:", dateChooser,
+                            "Select a new time:", timePicker
+                    };
+
+                    int option = JOptionPane.showConfirmDialog(null, message, "Reschedule Appointment",
+                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                    if (option == JOptionPane.OK_OPTION) {
+                        // Get the selected date and time
+                        Date selectedDate = dateChooser.getDate();
+                        Date currentDate = new Date(); // Current date
+                        if (selectedDate.before(currentDate)) {
+                            JOptionPane.showMessageDialog(null, "Please select a date that has not passed.");
+                            return; // Do not continue if the date has passed
+                        }
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+                        String newDate = sdf.format(selectedDate);
+                        String newTime = timePicker.getSelectedItem().toString();
+
+                        // Check for conflicting appointments
+                        boolean isConflict = false;
+                        for (int i = 0; i < model.getRowCount(); i++) {
+                            if (i == selectedRow) {
+                                continue; 
+                            }
+
+                            String existingDate = model.getValueAt(i, 6).toString();
+                            String existingTime = model.getValueAt(i, 7).toString();
+                            if (existingDate.equals(newDate) && existingTime.equals(newTime)) {
+                                isConflict = true;
+                                break;
+                            }
+                        }
+
+                        if (isConflict) {
+                            JOptionPane.showMessageDialog(null, "The selected date and time are already booked. Please choose another.");
+                            return; // Do not continue if there is a conflict
+                        }
+
+                        // Update the JTable model with the new date and time
+                        model.setValueAt(newDate, selectedRow, 6); // Assuming the date column is at index 6
+                        model.setValueAt(newTime, selectedRow, 7); // Assuming the time column is at index 7
+
+                        model.fireTableDataChanged(); // Notify the table that data has changed
+                        saveDataToFile(); // Save the modified data to the text file
+                    }
                 }
             }
         });
@@ -113,6 +175,24 @@ public class AppointmentList extends JFrame {
         btnNewButton.setOpaque(false);
         getContentPane().add(btnNewButton);
         
+        JButton btnNewButton_1 = new JButton("View Treatment History");
+        btnNewButton_1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                List<String> patientNames = new ArrayList<>();
+                for (int row = 0; row < model.getRowCount(); row++) {
+                    String patientName = model.getValueAt(row, 0).toString();
+                    if (!patientNames.contains(patientName)) {
+                        patientNames.add(patientName);
+                    }
+                }
+
+                TreatmentHistory historyFrame = new TreatmentHistory(model, patientNames);
+                historyFrame.setVisible(true);
+            }
+        });
+        btnNewButton_1.setBounds(499, 459, 190, 23);
+        getContentPane().add(btnNewButton_1);
+        
                 JLabel lblNewLabel = new JLabel("New label");
                 lblNewLabel.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\3.png"));
                 lblNewLabel.setBounds(0, 0, 1000, 563);
@@ -122,7 +202,7 @@ public class AppointmentList extends JFrame {
     private class HighlightRenderer extends DefaultTableCellRenderer {
         @Override
         public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
+                                                                  boolean hasFocus, int row, int column) {
             java.awt.Component cellComponent = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
                     row, column);
 
@@ -135,8 +215,21 @@ public class AppointmentList extends JFrame {
             return cellComponent;
         }
     }
+    public static void main(String[] args) {
+        DefaultTableModel model = new DefaultTableModel();
+       
 
-    // Method to save the data from the table model to the text file
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    AppointmentList frame = new AppointmentList(model);
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
     private void saveDataToFile() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("appointment_data.txt"));
